@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
   const albumsList = document.getElementById('albums-list');
-  const carouselContainer = document.getElementById('carousel-container');
-  const carousel = document.getElementById('carousel');
   const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+  const modalBody = document.querySelector('.modal-body');
+
   fetch('https://jsonplaceholder.typicode.com/users/1/albums')
     .then(response => response.json())
     .then(albums => {
@@ -14,40 +14,31 @@ document.addEventListener('DOMContentLoaded', function () {
         albumsList.appendChild(button);
       });
     });
-  
+
   function loadPhotos(albumId) {
     fetch(`https://jsonplaceholder.typicode.com/albums/${albumId}/photos`)
       .then(response => response.json())
       .then(photos => {
-        carouselContainer.classList.add('d-none');
-        carousel.classList.remove('d-none');
-        carousel.innerHTML = '';
+        modalBody.innerHTML = '';
         photos.forEach(photo => {
-          const item = document.createElement('div');
-          item.className = 'item';
           const img = document.createElement('img');
           img.src = photo.thumbnailUrl;
           img.alt = photo.title;
-          img.addEventListener('click', () => showModal(photo.url));
-          item.appendChild(img);
-          carousel.appendChild(item);
+          img.className = 'img-thumbnail m-2';
+          img.style.width = '150px'; 
+          img.style.cursor = 'pointer';
+          img.addEventListener('click', () => showModalImage(photo.url));
+          modalBody.appendChild(img);
         });
-        $(carousel).owlCarousel({
-          loop: true,
-          margin: 10,
-          nav: true,
-          responsive: {
-            0: { items: 1 },
-            600: { items: 3 },
-            1000: { items: 5 }
-          }
-        }).on('initialized.owl.carousel', () => console.log('Carousel initialized!'));          
+        modal.show(); 
       });
   }
-  
-  function showModal(imageUrl) {
-    const modalImage = document.getElementById('modal-image');
+
+  function showModalImage(imageUrl) {
+    const modalImage = document.createElement('img');
     modalImage.src = imageUrl;
-    modal.show();
+    modalImage.className = 'img-fluid';
+    modalBody.innerHTML = ''; 
+    modalBody.appendChild(modalImage);
   }
 });
